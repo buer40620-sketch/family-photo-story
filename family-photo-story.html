@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>家庭照片故事修复器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --accent-color: #F4A460;
+            --bg-color: #FFF8DC;
+            --text-color: #4A3728;
+            --card-bg: #FFFAF0;
+            --border-color: #DEB887;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #FFF8DC 0%, #FFE4C4 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-color);
+            box-shadow: 0 0 30px rgba(139, 69, 19, 0.1);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .home-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 30px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-section {
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(139, 69, 19, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .feature-card {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .feature-arrow {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 20px;
+            color: var(--secondary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover .feature-arrow {
+            opacity: 1;
+        }
+
+        .start-btn {
+            display: block;
+            width: calc(100% - 40px);
+            margin: 30px 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .download-btn {
+            display: block;
+            width: calc(100% - 40px);
+            margin: -20px 20px 30px;
+            padding: 15px;
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .upload-page {
+            padding: 20px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-size: 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        .back-btn::before {
+            content: '←';
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .upload-area {
+            background: var(--card-bg);
+            border: 3px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 60px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary-color);
+            background: #FFF;
+        }
+
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .example-photos {
+            margin-top: 30px;
+        }
+
+        .example-title {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .example-photo {
+            aspect-ratio: 1;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+            background: linear-gradient(135deg, #E8D5B7 0%, #D4C4A8 100%);
+        }
+
+        .example-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .example-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .example-photo .year-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(139, 69, 19, 0.8);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .chat-page {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .photo-preview {
+            background: var(--card-bg);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .photo-preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .photo-info h3 {
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .photo-info p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #FAFAFA;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.ai {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            border: 1px solid #E0E0E0;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 18px;
+            max-width: 75px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .quick-reply-btn {
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-reply-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--secondary-color);
+        }
+
+        .send-btn {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .card-page {
+            padding: 20px;
+        }
+
+        .memory-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(139, 69, 19, 0.15);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-photo {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .meta-icon {
+            font-size: 16px;
+        }
+
+        .card-story {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 5px 12px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .timeline-page {
+            padding: 20px;
+        }
+
+        .timeline-header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .timeline-header h2 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-header p {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+            animation: fadeInLeft 0.5s ease;
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--secondary-color);
+        }
+
+        .timeline-year {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(139, 69, 19, 0.1);
+        }
+
+        .timeline-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .timeline-card-content {
+            padding: 15px;
+        }
+
+        .timeline-card-title {
+            font-size: 15px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .timeline-card-desc {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 248, 220, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #E8D5B7 0%, #D4C4A8 100%);
+            position: relative;
+        }
+
+        .photo-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .photo-icon {
+            font-size: 40px;
+            opacity: 0.6;
+        }
+
+        .photo-label {
+            font-size: 12px;
+            color: #8B4513;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        .vignette {
+            position: relative;
+        }
+
+        .vignette::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.3);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .family-page {
+            padding: 20px;
+        }
+
+        .family-tree {
+            padding: 30px 0;
+        }
+
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tree-node {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(139, 69, 19, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            margin: 10px;
+        }
+
+        .tree-node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 25px rgba(139, 69, 19, 0.3);
+        }
+
+        .node-avatar {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .node-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .node-relation {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .tree-line {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
+            margin: 10px 0;
+        }
+
+        .tree-row {
+            display: flex;
+            gap: 30px;
+        }
+
+        .member-detail {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(139, 69, 19, 0.2);
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .member-detail.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+
+        .detail-avatar {
+            font-size: 48px;
+            margin-right: 15px;
+        }
+
+        .detail-info h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .detail-info p {
+            font-size: 13px;
+            opacity: 0.9;
+            margin: 5px 0 0;
+        }
+
+        .close-detail {
+            margin-left: auto;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            font-size: 14px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .detail-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .detail-photos {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .detail-photos img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .detail-photos img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homePage" class="page active">
+            <div class="home-header">
+                <div class="logo">📸</div>
+                <h1>家庭照片故事修复器</h1>
+                <p>让老照片开口说话，传承家族记忆</p>
+            </div>
+
+            <div class="feature-section">
+                <h2 class="section-title">核心功能</h2>
+                
+                <div class="feature-card" onclick="showFeatureDemo('ai')">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI 智能引导</h3>
+                    <p>像采访者一样，引导家人讲述照片背后的故事</p>
+                    <span class="feature-arrow">→</span>
+                </div>
+
+                <div class="feature-card" onclick="showFeatureDemo('card')">
+                    <div class="feature-icon">🎴</div>
+                    <h3>记忆卡片生成</h3>
+                    <p>自动整理照片信息，生成精美的家庭记忆卡片</p>
+                    <span class="feature-arrow">→</span>
+                </div>
+
+                <div class="feature-card" onclick="showFeatureDemo('timeline')">
+                    <div class="feature-icon">📅</div>
+                    <h3>家族时间线</h3>
+                    <p>按时间轴展示家族历史，呈现代际传承</p>
+                    <span class="feature-arrow">→</span>
+                </div>
+
+                <div class="feature-card" onclick="showFeatureDemo('family')">
+                    <div class="feature-icon">👨‍👩‍👧‍👦</div>
+                    <h3>人物关系图谱</h3>
+                    <p>记录照片中的人物关系，建立家族成员档案</p>
+                    <span class="feature-arrow">→</span>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="showPage('uploadPage')">开始记录家族记忆 →</button>
+
+            <button class="download-btn" onclick="downloadSingleFile()">📥 下载完整项目到本地</button>
+
+            <div style="height: 80px;"></div>
+        </div>
+
+        <div id="uploadPage" class="page">
+            <div class="upload-page">
+                <div class="back-btn" onclick="showPage('homePage')">返回</div>
+                
+                <h2 class="section-title">上传老照片</h2>
+                
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">点击上传照片</div>
+                    <div class="upload-hint">支持 JPG、PNG 格式</div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+
+                <div class="example-photos">
+                    <div class="example-title">或选择示例照片体验：</div>
+                    <div class="photo-grid">
+                        <div class="example-photo" onclick="selectExample(0)">
+                            <img src="images/60年代.jpg" alt="1960年代">
+                            <span class="year-badge">1960s</span>
+                        </div>
+                        <div class="example-photo" onclick="selectExample(1)">
+                            <img src="images/70年代.jpg" alt="1970年代">
+                            <span class="year-badge">1970s</span>
+                        </div>
+                        <div class="example-photo" onclick="selectExample(2)">
+                            <img src="images/80年代.jpg" alt="1980年代">
+                            <span class="year-badge">1980s</span>
+                        </div>
+                        <div class="example-photo" onclick="selectExample(3)">
+                            <img src="images/90年代.jpg" alt="1990年代">
+                            <span class="year-badge">1990s</span>
+                        </div>
+                        <div class="example-photo" onclick="selectExample(4)">
+                            <img src="images/00年代.jpg" alt="2000年代">
+                            <span class="year-badge">2000s</span>
+                        </div>
+                        <div class="example-photo" onclick="selectExample(5)">
+                            <img src="images/10年代.jpg" alt="2010年代">
+                            <span class="year-badge">2010s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chatPage" class="page">
+            <div class="chat-page">
+                <div class="chat-header">
+                    <h2>AI 故事采访</h2>
+                    <p>让我帮您记录这张照片背后的故事</p>
+                </div>
+
+                <div class="photo-preview">
+                    <div id="chatPhotoPlaceholder" class="photo-placeholder" style="width:60px;height:60px;border-radius:8px;">
+                        <span class="photo-icon">📷</span>
+                    </div>
+                    <div class="photo-info">
+                        <h3 id="photoTitle">照片标题</h3>
+                        <p id="photoYear">拍摄年份</p>
+                    </div>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="quick-replies" id="quickReplies">
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="输入您的回答...">
+                        <button class="send-btn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cardPage" class="page">
+            <div class="card-page">
+                <div class="back-btn" onclick="showPage('chatPage')">返回</div>
+                
+                <div class="success-badge">
+                    <span>✓</span>
+                    <span>记忆卡片已生成</span>
+                </div>
+
+                <div class="memory-card">
+                    <div id="cardPhotoPlaceholder" class="photo-placeholder" style="height:250px;">
+                        <span class="photo-icon">📸</span>
+                        <span class="photo-label">家庭记忆</span>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title" id="cardTitle">记忆标题</h2>
+                        
+                        <div class="card-meta">
+                            <div class="meta-item">
+                                <span class="meta-icon">📅</span>
+                                <span id="cardYear">1983年</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">📍</span>
+                                <span id="cardLocation">地点</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-icon">👥</span>
+                                <span id="cardPeople">人物</span>
+                            </div>
+                        </div>
+
+                        <div class="card-story" id="cardStory">
+                            故事内容将在这里显示...
+                        </div>
+
+                        <div class="card-tags" id="cardTags">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn secondary" onclick="showPage('uploadPage')">继续添加</button>
+                    <button class="action-btn primary" onclick="showPage('timelinePage')">查看时间线</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="timelinePage" class="page">
+            <div class="timeline-page">
+                <div class="back-btn" onclick="showPage('cardPage')">返回</div>
+                
+                <div class="timeline-header">
+                    <h2>家族时光轴</h2>
+                    <p>记录家族的重要时刻</p>
+                </div>
+
+                <div class="timeline" id="timeline">
+                </div>
+
+                <button class="start-btn" onclick="showPage('homePage')">返回首页</button>
+            </div>
+        </div>
+
+        <div id="familyPage" class="page">
+            <div class="family-page">
+                <div class="back-btn" onclick="showPage('homePage')">返回</div>
+                
+                <div class="timeline-header">
+                    <h2>人物关系图谱</h2>
+                    <p>探索家族成员间的关系</p>
+                </div>
+
+                <div class="family-tree">
+                    <div class="tree-container">
+                        <div class="tree-node" onclick="showMemberDetail('grandpa')">
+                            <div class="node-avatar">👴</div>
+                            <div class="node-name">爷爷</div>
+                            <div class="node-relation">第一代</div>
+                        </div>
+                        <div class="tree-line"></div>
+                        <div class="tree-row">
+                            <div class="tree-node" onclick="showMemberDetail('dad')">
+                                <div class="node-avatar">👨</div>
+                                <div class="node-name">爸爸</div>
+                                <div class="node-relation">第二代</div>
+                            </div>
+                            <div class="tree-node" onclick="showMemberDetail('aunt')">
+                                <div class="node-avatar">👩</div>
+                                <div class="node-name">姑姑</div>
+                                <div class="node-relation">第二代</div>
+                            </div>
+                        </div>
+                        <div class="tree-line"></div>
+                        <div class="tree-row">
+                            <div class="tree-node" onclick="showMemberDetail('me')">
+                                <div class="node-avatar">👦</div>
+                                <div class="node-name">我</div>
+                                <div class="node-relation">第三代</div>
+                            </div>
+                            <div class="tree-node" onclick="showMemberDetail('cousin')">
+                                <div class="node-avatar">👧</div>
+                                <div class="node-name">表妹</div>
+                                <div class="node-relation">第三代</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="member-detail" id="memberDetail">
+                    <div class="detail-header">
+                        <div class="detail-avatar" id="detailAvatar">👤</div>
+                        <div class="detail-info">
+                            <h3 id="detailName">成员姓名</h3>
+                            <p id="detailRelation">关系</p>
+                        </div>
+                        <div class="close-detail" onclick="hideMemberDetail()">×</div>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-section">
+                            <h4>📅 基本信息</h4>
+                            <p id="detailInfo">暂无信息</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>📖 故事回忆</h4>
+                            <p id="detailStory">暂无故事</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>📷 相关照片</h4>
+                            <div class="detail-photos" id="detailPhotos"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="showPage('homePage')">返回首页</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">AI 正在分析照片...</div>
+        </div>
+    </div>
+
+    <script>
+        const photoIcons = ['👨‍👩‍👧', '🏠', '🛵', '🎉', '💒', '👶'];
+
+        const examplePhotos = [
+            {
+                icon: '👨‍👩‍👧',
+                image: 'images/60年代.jpg',
+                year: '1966年',
+                title: '春节全家福',
+                location: '老家',
+                people: '全家五口',
+                story: '66年春节拍的全家福，那时候生活虽然艰苦，但一家人在一起就是幸福。孩子们都穿着补丁衣服，妻子梳着两条长长的辫子，那是那个年代特有的风貌。',
+                tags: ['全家福', '60年代', '春节', '珍贵回忆']
+            },
+            {
+                icon: '📚',
+                image: 'images/70年代.jpg',
+                year: '1970年代',
+                title: '学校珠算课',
+                location: '村小学',
+                people: '同学们',
+                story: '那时候我们用算盘学习算数，老师教得特别认真。放学后大家还在一起练习，比比谁算得快。算盘珠子噼里啪啦的声音，至今还能想起。',
+                tags: ['珠算', '70年代', '小学生', '校园生活']
+            },
+            {
+                icon: '🥢',
+                image: 'images/80年代.jpg',
+                year: '1980年代',
+                title: '家庭聚餐',
+                location: '家中',
+                people: '亲友们',
+                story: '改革开放后，生活渐渐好起来了。过年过节家里会摆上丰盛的饭菜，亲戚朋友聚在一起，举杯庆祝。那时候的橘子和花生都是稀罕物。',
+                tags: ['聚餐', '80年代', '改革开放', '家庭聚会']
+            },
+            {
+                icon: '🏠',
+                image: 'images/90年代.jpg',
+                year: '1990年代',
+                title: '新家客厅',
+                location: '新楼房',
+                people: '家人',
+                story: '90年代我们搬进了新楼房，家里有了冰箱和沙发。生活条件越来越好，孩子也长大了，正在给大家读报纸。这张照片记录了那个时代的幸福生活。',
+                tags: ['新家', '90年代', '冰箱', '幸福生活']
+            },
+            {
+                icon: '🎉',
+                image: 'images/00年代.jpg',
+                year: '2000年代',
+                title: '家庭聚会',
+                location: '饭店',
+                people: '亲友们',
+                story: '千禧年后，我们开始去饭店聚餐。餐桌上有了可乐和红酒，生活水平提高了很多。孩子们也长大了，开始有自己的生活和事业。',
+                tags: ['聚餐', '00年代', '可乐', '时代变迁']
+            },
+            {
+                icon: '🎓',
+                image: 'images/10年代.jpg',
+                year: '2010年代',
+                title: '中学教室',
+                location: '中学',
+                people: '同学们',
+                story: '新一代的孩子们在明亮的教室里学习，穿着统一的校服。现在的孩子幸福多了，有更好的学习条件和环境。希望他们能珍惜现在的生活。',
+                tags: ['中学', '10年代', '校服', '青春记忆']
+            }
+        ];
+
+        let currentPhotoIndex = 0;
+        let chatHistory = [];
+        let currentQuestionIndex = 0;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    startChatWithPhoto(e.target.result, '您的照片', '刚刚上传');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function selectExample(index) {
+            currentPhotoIndex = index;
+            const photo = examplePhotos[index];
+            startChatWithPhoto(null, photo.title, photo.year);
+        }
+
+        function startChatWithPhoto(photoUrl, title, year) {
+            showLoading('AI 正在分析照片...');
+            
+            setTimeout(() => {
+                hideLoading();
+                
+                const photo = examplePhotos[currentPhotoIndex];
+                const chatPlaceholder = document.getElementById('chatPhotoPlaceholder');
+                chatPlaceholder.innerHTML = `<img src="${photo.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+                
+                document.getElementById('photoTitle').textContent = title;
+                document.getElementById('photoYear').textContent = year;
+                
+                chatHistory = [];
+                currentQuestionIndex = 0;
+                document.getElementById('chatContainer').innerHTML = '';
+                
+                showPage('chatPage');
+                
+                setTimeout(() => {
+                    addAIMessage('您好！我是家庭记忆助手。我看到您上传了一张老照片，让我来帮您记录这张照片背后的故事。');
+                    
+                    setTimeout(() => {
+                        addAIMessage('这张照片是什么时候拍的？您还记得具体的年份吗？');
+                        showQuickReplies(['1980年代', '1990年代', '2000年代', '记不清了']);
+                    }, 1000);
+                }, 500);
+            }, 1500);
+        }
+
+        function addAIMessage(text) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai';
+            messageDiv.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="message-content">${text}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            chatHistory.push({ role: 'ai', text: text });
+        }
+
+        function addUserMessage(text) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `
+                <div class="message-content">${text}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            chatHistory.push({ role: 'user', text: text });
+        }
+
+        function showQuickReplies(options) {
+            const container = document.getElementById('quickReplies');
+            container.innerHTML = options.map(opt => 
+                `<button class="quick-reply-btn" onclick="handleQuickReply('${opt}')">${opt}</button>`
+            ).join('');
+        }
+
+        function handleQuickReply(text) {
+            addUserMessage(text);
+            document.getElementById('quickReplies').innerHTML = '';
+            
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                processUserInput(text);
+            }, 1000);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addUserMessage(text);
+            input.value = '';
+            document.getElementById('quickReplies').innerHTML = '';
+            
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+                processUserInput(text);
+            }, 1200);
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function processUserInput(text) {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex === 1) {
+                addAIMessage('照片是在哪里拍的？是家里、照相馆还是户外？');
+                showQuickReplies(['家里', '照相馆', '户外', '其他地方']);
+            } else if (currentQuestionIndex === 2) {
+                addAIMessage('照片里都有谁？能介绍一下他们的身份吗？');
+                showQuickReplies(['家人', '亲戚', '朋友', '同学/同事']);
+            } else if (currentQuestionIndex === 3) {
+                addAIMessage('这张照片背后有什么特别的故事或回忆吗？');
+                showQuickReplies(['有特别的故事', '只是普通留念', '记不太清了']);
+            } else if (currentQuestionIndex === 4) {
+                addAIMessage('这张照片对您来说有什么特殊的意义吗？');
+                showQuickReplies(['非常珍贵', '一般留念', '说不清楚']);
+            } else if (currentQuestionIndex === 5) {
+                addAIMessage('太好了！我已经记录下了这张照片的故事。让我为您生成一张精美的记忆卡片...');
+                
+                setTimeout(() => {
+                    generateMemoryCard();
+                }, 1500);
+            }
+        }
+
+        function generateMemoryCard() {
+            const photo = examplePhotos[currentPhotoIndex];
+            
+            const cardPlaceholder = document.getElementById('cardPhotoPlaceholder');
+            cardPlaceholder.innerHTML = `<img src="${photo.image}" style="width:100%;height:100%;object-fit:cover;">`;
+            
+            document.getElementById('cardTitle').textContent = photo.title;
+            document.getElementById('cardYear').textContent = photo.year;
+            document.getElementById('cardLocation').textContent = photo.location;
+            document.getElementById('cardPeople').textContent = photo.people;
+            document.getElementById('cardStory').textContent = photo.story;
+            
+            const tagsContainer = document.getElementById('cardTags');
+            tagsContainer.innerHTML = photo.tags.map(tag => 
+                `<span class="tag">${tag}</span>`
+            ).join('');
+            
+            showPage('cardPage');
+            
+            addToTimeline(photo);
+        }
+
+        let timelineData = [];
+
+        function addToTimeline(photo) {
+            if (!timelineData.find(p => p.year === photo.year)) {
+                timelineData.push(photo);
+                timelineData.sort((a, b) => {
+                    const yearA = parseInt(a.year);
+                    const yearB = parseInt(b.year);
+                    return yearA - yearB;
+                });
+            }
+            
+            renderTimeline();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            container.innerHTML = timelineData.map(photo => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">${photo.year}</div>
+                    <div class="timeline-card">
+                        <img src="${photo.image}" style="width:100%;height:150px;object-fit:cover;">
+                        <div class="timeline-card-content">
+                            <div class="timeline-card-title">${photo.title}</div>
+                            <div class="timeline-card-desc">${photo.story.substring(0, 60)}...</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function initTimeline() {
+            timelineData = [
+                examplePhotos[0],
+                examplePhotos[2],
+                examplePhotos[4]
+            ];
+            renderTimeline();
+        }
+
+        window.onload = function() {
+            initTimeline();
+        };
+
+        function showFeatureDemo(feature) {
+            switch(feature) {
+                case 'ai':
+                    selectExample(0);
+                    break;
+                case 'card':
+                    currentPhotoIndex = 0;
+                    const photo = examplePhotos[0];
+                    const cardPlaceholder = document.getElementById('cardPhotoPlaceholder');
+                    cardPlaceholder.innerHTML = `<img src="${photo.image}" style="width:100%;height:100%;object-fit:cover;">`;
+                    document.getElementById('cardTitle').textContent = photo.title;
+                    document.getElementById('cardYear').textContent = photo.year;
+                    document.getElementById('cardLocation').textContent = photo.location;
+                    document.getElementById('cardPeople').textContent = photo.people;
+                    document.getElementById('cardStory').textContent = photo.story;
+                    const tagsContainer = document.getElementById('cardTags');
+                    tagsContainer.innerHTML = photo.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                    showPage('cardPage');
+                    break;
+                case 'timeline':
+                    initTimeline();
+                    showPage('timelinePage');
+                    break;
+                case 'family':
+                    hideMemberDetail();
+                    showPage('familyPage');
+                    break;
+            }
+        }
+
+        const familyMembers = {
+            grandpa: {
+                avatar: '👴',
+                name: '爷爷',
+                relation: '第一代 - 祖父',
+                info: '出生于1930年，年轻时当过兵，后来在农村种地。一生勤劳朴实，是家里的顶梁柱。',
+                story: '爷爷最喜欢给我们讲他年轻时的故事，说那时候当兵条件艰苦，但大家都很团结。他还教我们怎么种地，怎么修农具。',
+                photos: ['images/60年代.jpg', 'images/70年代.jpg']
+            },
+            dad: {
+                avatar: '👨',
+                name: '爸爸',
+                relation: '第二代 - 父亲',
+                info: '出生于1958年，是家里的长子。当过工人，后来自己创业做生意。',
+                story: '爸爸年轻时在工厂上班，每天骑自行车上下班。后来改革开放，他抓住机会开始做小生意，日子慢慢好起来了。',
+                photos: ['images/80年代.jpg', 'images/90年代.jpg']
+            },
+            aunt: {
+                avatar: '👩',
+                name: '姑姑',
+                relation: '第二代 - 姑姑',
+                info: '出生于1962年，是一名教师。在村里的小学教了一辈子书。',
+                story: '姑姑特别喜欢孩子，在学校里是孩子们最喜欢的老师。她教过的学生现在遍布各地，每年都有学生来看望她。',
+                photos: ['images/70年代.jpg', 'images/00年代.jpg']
+            },
+            me: {
+                avatar: '👦',
+                name: '我',
+                relation: '第三代 - 孙子',
+                info: '出生于1990年，是家里的独生子。现在在城市里工作，经常回来看望长辈。',
+                story: '小时候最喜欢跟着爷爷去田里干活，虽然很累，但很开心。现在长大了，才明白爷爷那一代人的辛苦和不易。',
+                photos: ['images/90年代.jpg', 'images/10年代.jpg']
+            },
+            cousin: {
+                avatar: '👧',
+                name: '表妹',
+                relation: '第三代 - 侄女',
+                info: '出生于1995年，姑姑的女儿。大学毕业后留在了大城市工作。',
+                story: '表妹从小学习就很好，是全家人的骄傲。她考上大学那天，全家人都特别高兴，爷爷激动得流下了眼泪。',
+                photos: ['images/00年代.jpg', 'images/10年代.jpg']
+            }
+        };
+
+        function showMemberDetail(memberId) {
+            const member = familyMembers[memberId];
+            if (!member) return;
+
+            document.getElementById('detailAvatar').textContent = member.avatar;
+            document.getElementById('detailName').textContent = member.name;
+            document.getElementById('detailRelation').textContent = member.relation;
+            document.getElementById('detailInfo').textContent = member.info;
+            document.getElementById('detailStory').textContent = member.story;
+            
+            const photosContainer = document.getElementById('detailPhotos');
+            photosContainer.innerHTML = member.photos.map(photo => 
+                `<img src="${photo}" onclick="viewPhoto('${photo}')">`
+            ).join('');
+
+            document.getElementById('memberDetail').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('memberDetail').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function hideMemberDetail() {
+            document.getElementById('memberDetail').classList.remove('show');
+        }
+
+        function viewPhoto(src) {
+            alert('照片预览功能：' + src);
+        }
+
+        function downloadSingleFile() {
+            const link = document.createElement('a');
+            link.href = 'family-photo-story-single.html';
+            link.download = '家庭照片故事修复器.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

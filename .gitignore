@@ -1,0 +1,8 @@
+node_modules/
+package.json
+package-lock.json
+build-*.js
+family-photo-story-single.html
+family-photo-story-single.html.gz
+创意方案_家庭照片故事修复器.zip
+.git/
